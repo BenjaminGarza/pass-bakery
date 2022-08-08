@@ -11,3 +11,4 @@ target
 /RUNNING_PID
 /pass-bakery/.g8
 .DS_Store
+production.conf

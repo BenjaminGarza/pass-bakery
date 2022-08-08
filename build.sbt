@@ -1,6 +1,3 @@
-import scala.Console.in
-
-
 name := """pass-bakery"""
 organization := "com.example"
 
