@@ -12,3 +12,4 @@ target
 /pass-bakery/.g8
 .DS_Store
 production.conf
+.scalafmt.conf
