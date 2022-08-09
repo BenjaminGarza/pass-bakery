@@ -10,7 +10,7 @@ import play.api.mvc._
 class APIController @Inject()(val environment: Environment, val controllerComponents: ControllerComponents) extends BaseController {
 
   def statusToJson: String={
-    val status = models.Status("pass-bakery",environment.mode.toString,APIService.getDateTime)
+    val status = models.Status("pass-bakery", environment.mode.toString, APIService.getDateTime)
     status.asJson.spaces2
     }
 

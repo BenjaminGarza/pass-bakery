@@ -10,9 +10,7 @@ class APIService {
 object APIService{
   //get DateTime from server
   def getDateTime: String ={
-    val dateTime: String =  LocalDateTime.now().toString
-    val formatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
-    val parsedDateTime: LocalDateTime = LocalDateTime.parse(dateTime,formatter)
+    val parsedDateTime: LocalDateTime = LocalDateTime.parse(LocalDateTime.now().toString, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
     //Truncate to remove nano seconds
     parsedDateTime.truncatedTo(ChronoUnit.SECONDS).toString
   }
