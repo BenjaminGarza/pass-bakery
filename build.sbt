@@ -15,9 +15,3 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-parser" % "0.12.2",
   "com.dripower" %% "play-circe" % "2812.0", // compatible with Play 2.8.x
 )
-
-// Adds additional packages into Twirl
-//TwirlKeys.templateImports += "com.example.controllers._"
-
-// Adds additional packages into conf/routes
-// play.sbt.routes.RoutesKeys.routesImport += "com.example.binders._"
