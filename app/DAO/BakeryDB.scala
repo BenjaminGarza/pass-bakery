@@ -28,9 +28,9 @@ class BakeryDB {
     implicit val writes: Writes[Products] = Json.writes[Products]
   }
 
-  def findAll(): List[String] =
+  def findAll(): List[Products] =
     sql"select * from products"
-      .query[String]
+      .query[Products]
       .to[List]
       .transact(xa)
       .unsafeRunSync()
