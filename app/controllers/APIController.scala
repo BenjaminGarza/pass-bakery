@@ -6,11 +6,13 @@ import io.circe.syntax.EncoderOps
 import javax.inject._
 import play.api._
 import play.api.mvc._
+import DAO.BakeryDB
 
 @Singleton
 class APIController @Inject() (
     val environment: Environment,
-    val controllerComponents: ControllerComponents
+    val controllerComponents: ControllerComponents,
+    bakeryDB: BakeryDB
 ) extends BaseController {
 
   def statusToJson: String = {
@@ -27,4 +29,8 @@ class APIController @Inject() (
       Ok(statusToJson)
   }
 
+  def findAllProducts(): Action[AnyContent] = Action {
+    implicit request: Request[AnyContent] =>
+      Ok(bakeryDB.findAll().asJson.spaces2)
+  }
 }

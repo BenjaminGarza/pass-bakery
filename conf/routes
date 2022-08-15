@@ -11,3 +11,5 @@ GET     /assets/*file               controllers.Assets.versioned(path="/public",
 
 # API endpoints
 GET /pass-bakery/status             controllers.APIController.serviceStatus()
+#GET /rest/bakery/product/:id            controllers.APIController.findID()
+GET /rest/bakery                         controllers.APIController.findAllProducts()
