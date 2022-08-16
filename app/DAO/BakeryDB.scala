@@ -15,7 +15,7 @@ class BakeryDB {
     "pass"
   )
 
-  case class Products(
+  case class Product(
       id: String,
       name: String,
       quantity: Int,
@@ -24,13 +24,9 @@ class BakeryDB {
       updatedAt: String
   )
 
-  object Products {
-    implicit val writes: Writes[Products] = Json.writes[Products]
-  }
-
-  def findAll(): List[Products] =
+  def findAll(): List[Product] =
     sql"select * from products"
-      .query[Products]
+      .query[Product]
       .to[List]
       .transact(xa)
       .unsafeRunSync()
