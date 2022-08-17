@@ -23,10 +23,10 @@ class BakeryDB {
       updatedAt: String
   )
 
-  def findAll(): Array[Product] =
+  def findAll(): List[Product] =
     sql"select * from products"
       .query[Product]
-      .to[Array]
+      .to[List]
       .transact(xa)
       .unsafeRunSync()
 
