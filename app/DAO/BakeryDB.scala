@@ -4,7 +4,6 @@ import doobie._
 import doobie.implicits._
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import play.api.libs.json.{Json, Writes}
 
 class BakeryDB {
 
@@ -24,10 +23,10 @@ class BakeryDB {
       updatedAt: String
   )
 
-  def findAll(): List[Product] =
+  def findAll(): Array[Product] =
     sql"select * from products"
       .query[Product]
-      .to[List]
+      .to[Array]
       .transact(xa)
       .unsafeRunSync()
 
