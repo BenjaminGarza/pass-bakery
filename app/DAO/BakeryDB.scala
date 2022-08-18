@@ -28,7 +28,7 @@ class BakeryDB {
   )
 
   def findAll(): List[Product] = {
-    sql"select * from products"
+    sql"select * from Product"
       .query[Product]
       .to[List]
       .transact(xa)
