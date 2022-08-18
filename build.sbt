@@ -22,3 +22,6 @@ libraryDependencies ++= Seq(
   "org.tpolecat" %% "doobie-postgres" % "1.0.0-RC1" // Postgres driver 42.3.1 + type mappings.
 )
 libraryDependencies ++= Seq(evolutions, jdbc)
+libraryDependencies ++= Seq(
+  "org.scalatestplus.play" %% "scalatestplus-play" % "3.0.x" % "test"
+)
