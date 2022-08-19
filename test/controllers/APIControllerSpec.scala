@@ -18,7 +18,7 @@ class APIControllerSpec
     with Injecting {
 
   "APIController" should {
-    "Should return ok" in {
+    "Should return status" in {
       val controller = inject[APIController]
       val result: Future[Result] = controller
         .serviceStatus()
@@ -28,6 +28,16 @@ class APIControllerSpec
       bodyText must include("pass-bakery")
       bodyText must include("Test")
       bodyText must include(LocalDate.now().toString)
+    }
+
+    "Should return Nil when table is empty" in {
+      val controller = inject[APIController]
+      val result: Future[Result] = controller
+        .findAllProducts()
+        .apply(FakeRequest(GET, "/rest/bakery"))
+      val bodyText: String = contentAsString(result)
+      status(result) mustBe 200
+      bodyText must include("Nil")
     }
   }
 

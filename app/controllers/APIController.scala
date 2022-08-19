@@ -10,7 +10,7 @@ import DAO.BakeryDB
 
 @Singleton
 class APIController @Inject() (
-    val environment: Environment,
+    environment: Environment,
     val controllerComponents: ControllerComponents,
     bakeryDB: BakeryDB
 ) extends BaseController {
