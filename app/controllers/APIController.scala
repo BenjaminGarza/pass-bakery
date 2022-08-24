@@ -71,9 +71,16 @@ class APIController @Inject() (
 
   def postProduct(): Action[AnyContent] = Action {
     implicit request: Request[AnyContent] =>
-      val parseResult = parseFromJson(request).getOrElse(false)
-      if (parseResult.isInstanceOf[ProductFromJson]) {}
-      Ok("Post successful")
+      parseFromJson(request) match {
+        case None =>
+          BadRequest("Post failed")
+        case Some(product) =>
+          println(product.name, product.quantity, product.price)
+          val rowsUpdated =
+            bakeryDB.addProduct(product.name, product.quantity, product.price)
+          println(rowsUpdated)
+          Ok("Post successful, " ++ rowsUpdated.toString ++ " rows updated")
+      }
   }
   def findAllProducts(): Action[AnyContent] = Action {
     implicit request: Request[AnyContent] =>

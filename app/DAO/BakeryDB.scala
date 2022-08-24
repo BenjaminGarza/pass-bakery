@@ -32,13 +32,20 @@ class BakeryDB {
       updatedAt: OffsetDateTime
   )
 
-  def addProduct(name: String, quantity: Int, price: Double): Update0 = {
-//    val uuid = gen_random_uuid()
-    val insertStatement =
-      sql"INSERT INTO Product (id, name, quantity, price, createdAt, updatedAt) VALUES (gen_random_uuid(), $name, $quantity, $price)"
-    Console.println(insertStatement, "Insert statement")
-    insertStatement.update
+  def addProduct(
+      name: String,
+      quantity: Int,
+      price: Double
+  ): Int = {
+    println(name, quantity, price, "addProduct")
+    val createdAt = LocalDateTime.now()
+    val insertStatement = {
+      sql"INSERT INTO product (id, name, quantity, price, created_at, updated_at) VALUES (gen_random_uuid(), $name, $quantity, $price, $createdAt, $createdAt)"
+    }
 
+    insertStatement.update.run
+      .transact(xa)
+      .unsafeRunSync()
   }
 
   def findAll(): List[Product] = {
