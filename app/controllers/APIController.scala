@@ -33,13 +33,11 @@ class APIController @Inject() (
           BadRequest("Request was invalid, nothing in request body")
           None
         case Some(rawText) => {
-          println("Request body has text")
           circe.parser.parse(rawText) match { // Is there valid Json?
             case Left(failure) =>
               BadRequest("Request was invalid, no valid Json");
               None
             case Right(json) =>
-              println(json, "Json matched")
               parser
                 .decode[ProductFromJson](json.toString()) match { // Can that Json be decoded into a case class?
                 case Left(error) =>
