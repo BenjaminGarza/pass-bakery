@@ -27,8 +27,6 @@ class APIController @Inject() (
   }
 
   def parseFromJson(request: Request[AnyContent]): Option[ProductFromJson] = {
-
-    Console.println(request.body.asText)
     val parseResult: Option[ProductFromJson] = {
       request.body.asText match {
         case None =>
@@ -55,7 +53,6 @@ class APIController @Inject() (
         }
       }
     }
-    println(parseResult, parseResult.getOrElse("Could not get parseResult"))
     parseResult
   }
   case class ProductFromJson(
@@ -75,10 +72,8 @@ class APIController @Inject() (
         case None =>
           BadRequest("Post failed")
         case Some(product) =>
-          println(product.name, product.quantity, product.price)
           val rowsUpdated =
             bakeryDB.addProduct(product.name, product.quantity, product.price)
-          println(rowsUpdated)
           Ok("Post successful, " ++ rowsUpdated.toString ++ " rows updated")
       }
   }
