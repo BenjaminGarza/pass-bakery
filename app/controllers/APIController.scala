@@ -26,44 +26,36 @@ class APIController @Inject() (
     status.asJson.spaces2
   }
 
-  def parseFromJson(request: Request[AnyContent]): Any = {
+  def parseFromJson(request: Request[AnyContent]): Option[ProductFromJson] = {
 
     Console.println(request.body.asText)
-    val parseResult =
+    val parseResult: Option[ProductFromJson] = {
       request.body.asText match {
-
         case None =>
-          BadRequest("Request was invalid, json could not be parsed");
-          println("Request body has no text")
-
+          BadRequest("Request was invalid, nothing in request body")
+          None
         case Some(rawText) => {
           println("Request body has text")
-          circe.parser.parse(rawText) match {
+          circe.parser.parse(rawText) match { // Is there valid Json?
             case Left(failure) =>
-              BadRequest("Request was invalid, json could not be parsed");
-              println("Json couldn't be parsed")
+              BadRequest("Request was invalid, no valid Json");
+              None
             case Right(json) =>
-              println("Pattern matched ")
-              println(json, "Line 60")
-              val product = parser
-                .decode[ProductFromJson](json.toString())
-              product match {
-                case Left(error)    =>
-                case Right(product) => println(product.name, "Product")
+              println(json, "Json matched")
+              parser
+                .decode[ProductFromJson](json.toString()) match { // Can that Json be decoded into a case class?
+                case Left(error) =>
+                  BadRequest(
+                    "Request was invalid, json could not be parsed into case class"
+                  )
+                  None
+                case Right(product) => Some(product)
               }
-
-            //          bakeryDB.addProduct(
-            //            name,
-            //            quantity,
-            //            price
-            //          )
           }
         }
-
       }
-
-    println(parseResult.toString, "the parse result")
-
+    }
+    println(parseResult, parseResult.getOrElse("Could not get parseResult"))
     parseResult
   }
   case class ProductFromJson(
@@ -79,7 +71,8 @@ class APIController @Inject() (
 
   def postProduct(): Action[AnyContent] = Action {
     implicit request: Request[AnyContent] =>
-      parseFromJson(request)
+      val parseResult = parseFromJson(request).getOrElse(false)
+      if (parseResult.isInstanceOf[ProductFromJson]) {}
       Ok("Post successful")
   }
   def findAllProducts(): Action[AnyContent] = Action {
