@@ -30,20 +30,15 @@ class APIController @Inject() (
     val parseResult: Option[ProductFromJson] = {
       request.body.asText match {
         case None =>
-          BadRequest("Request was invalid, nothing in request body")
           None
         case Some(rawText) => {
-          circe.parser.parse(rawText) match { // Is there valid Json?
+          circe.parser.parse(rawText) match {
             case Left(failure) =>
-              BadRequest("Request was invalid, no valid Json");
               None
             case Right(json) =>
               parser
-                .decode[ProductFromJson](json.toString()) match { // Can that Json be decoded into a case class?
+                .decode[ProductFromJson](json.toString()) match {
                 case Left(error) =>
-                  BadRequest(
-                    "Request was invalid, json could not be parsed into case class"
-                  )
                   None
                 case Right(product) => Some(product)
               }
