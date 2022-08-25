@@ -62,4 +62,10 @@ class BakeryDB {
       .unsafeRunSync()
   }
 
+  def deleteByID(id: UUID): Int = {
+    sql"DELETE FROM Product WHERE id=$id".update.run
+      .transact(xa)
+      .unsafeRunSync()
+  }
+
 }

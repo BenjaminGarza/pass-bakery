@@ -86,4 +86,14 @@ class APIController @Inject() (
     implicit request: Request[AnyContent] =>
       Ok(bakeryDB.findAll().asJson.spaces2)
   }
+  def deleteByID(id: UUID): Action[AnyContent] = Action {
+    implicit request: Request[AnyContent] =>
+      bakeryDB.findByID(id) match {
+        case None =>
+          NotFound("Product not found")
+        case Some(product) =>
+          val rowsModified = bakeryDB.deleteByID(id)
+          Ok(rowsModified.toString ++ " row deleted")
+      }
+  }
 }
