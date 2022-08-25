@@ -33,15 +33,20 @@ class APIController @Inject() (
     val parseResult: Option[ProductFromJson] = {
       request.body.asText match {
         case None =>
+          println("asText failed")
           None
         case Some(rawText) => {
+          println(rawText)
           circe.parser.parse(rawText) match {
             case Left(failure) =>
+              println("Parser failed")
               None
             case Right(json) =>
+              println(json.toString())
               parser
                 .decode[ProductFromJson](json.toString()) match {
                 case Left(error) =>
+                  println(error)
                   None
                 case Right(product) => Some(product)
               }
@@ -52,9 +57,9 @@ class APIController @Inject() (
     parseResult
   }
   case class ProductFromJson(
-      name: String,
-      quantity: Int,
-      price: Double
+      name: Option[String],
+      quantity: Option[Int],
+      price: Option[Double]
   )
 
   def serviceStatus(): Action[AnyContent] = Action {
@@ -69,8 +74,13 @@ class APIController @Inject() (
           BadRequest("Post failed")
         case Some(product) =>
           val rowsUpdated =
-            bakeryDB.addProduct(product.name, product.quantity, product.price)
+            bakeryDB.addProduct(
+              product.name.get,
+              product.quantity.get,
+              product.price.get
+            ) //Need to properly setup getOrElse here
           Ok("Post successful, " ++ rowsUpdated.toString ++ " rows updated")
+          Ok("Work in progress")
       }
   }
   def findByID(id: UUID): Action[AnyContent] = Action {
@@ -85,6 +95,26 @@ class APIController @Inject() (
   def findAllProducts(): Action[AnyContent] = Action {
     implicit request: Request[AnyContent] =>
       Ok(bakeryDB.findAll().asJson.spaces2)
+  }
+  def editByID(id: UUID): Action[AnyContent] = Action {
+    implicit request: Request[AnyContent] =>
+      bakeryDB.findByID(id) match {
+        case None =>
+          NotFound("Product not found")
+        case Some(product) =>
+          parseFromJson(request) match {
+            case None =>
+              BadRequest("Update failed")
+            case Some(product) =>
+              val rowsModified = bakeryDB.editByID(
+                id,
+                product.name,
+                product.quantity,
+                product.price
+              )
+              Ok("")
+          }
+      }
   }
   def deleteByID(id: UUID): Action[AnyContent] = Action {
     implicit request: Request[AnyContent] =>

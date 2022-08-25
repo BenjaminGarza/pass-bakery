@@ -62,6 +62,35 @@ class BakeryDB {
       .unsafeRunSync()
   }
 
+  def editByID(
+      id: UUID,
+      name: Option[String],
+      quantity: Option[Int],
+      price: Option[Double]
+  ): Option[Product] = {
+    val nameFragment = name.getOrElse(None) match {
+      case None       => ""
+      case Some(name) => " ,".concat(name.toString)
+    }
+    val quantityFragment = quantity.getOrElse(None) match {
+      case None           => ""
+      case Some(quantity) => " ,".concat(quantity.toString)
+    }
+    val priceFragment = price.getOrElse(None) match {
+      case None        => ""
+      case Some(price) => " ,".concat(price.toString)
+    }
+
+    println(
+      sql"UPDATE Product SET $nameFragment $quantityFragment $priceFragment WHERE id=$id"
+    )
+    sql"UPDATE Product SET $nameFragment $quantityFragment $priceFragment WHERE id=$id"
+      .query[Product]
+      .option
+      .transact(xa)
+      .unsafeRunSync()
+  }
+
   def deleteByID(id: UUID): Int = {
     sql"DELETE FROM Product WHERE id=$id".update.run
       .transact(xa)
