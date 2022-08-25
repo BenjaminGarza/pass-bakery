@@ -4,11 +4,14 @@ import services._
 import io.circe.generic.codec.DerivedAsObjectCodec.deriveCodec
 import io.circe.syntax.EncoderOps
 import io.circe._
+
 import javax.inject._
 import play.api._
 import play.api.mvc._
 import DAO.BakeryDB
 import io.circe
+
+import java.util.UUID
 
 @Singleton
 class APIController @Inject() (
@@ -68,6 +71,15 @@ class APIController @Inject() (
           val rowsUpdated =
             bakeryDB.addProduct(product.name, product.quantity, product.price)
           Ok("Post successful, " ++ rowsUpdated.toString ++ " rows updated")
+      }
+  }
+  def findByID(id: UUID): Action[AnyContent] = Action {
+    implicit request: Request[AnyContent] =>
+      bakeryDB.findByID(id) match {
+        case None =>
+          NotFound("Product not found")
+        case Some(product) =>
+          Ok(product.asJson.spaces2)
       }
   }
   def findAllProducts(): Action[AnyContent] = Action {

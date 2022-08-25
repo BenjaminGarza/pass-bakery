@@ -9,7 +9,9 @@ import cats.implicits
 import doobie.postgres.implicits._
 import doobie.postgres.pgisimplicits._
 import cats.effect.unsafe.implicits.global
+
 import java.time.{LocalDateTime, OffsetDateTime}
+import java.util.UUID
 
 class BakeryDB {
 
@@ -40,6 +42,14 @@ class BakeryDB {
     }
 
     insertStatement.update.run
+      .transact(xa)
+      .unsafeRunSync()
+  }
+
+  def findByID(id: UUID): Option[Product] = {
+    sql"SELECT * FROM Product WHERE id=$id"
+      .query[Product]
+      .option
       .transact(xa)
       .unsafeRunSync()
   }

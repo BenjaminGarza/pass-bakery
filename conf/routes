@@ -11,6 +11,6 @@ GET     /assets/*file               controllers.Assets.versioned(path="/public",
 
 # API endpoints
 GET /pass-bakery/status             controllers.APIController.serviceStatus()
-#GET /rest/bakery/product/:id            controllers.APIController.findID()
+GET /rest/bakery/product/:id            controllers.APIController.findByID(id: java.util.UUID)
 GET /rest/bakery/product                         controllers.APIController.findAllProducts()
 POST /rest/bakery/product                                 controllers.APIController.postProduct()
