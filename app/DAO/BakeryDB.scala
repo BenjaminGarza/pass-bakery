@@ -55,23 +55,24 @@ class BakeryDB {
       quantity: Option[Int],
       price: Option[Double]
   ): Unit = {
+    val updatedAt = LocalDateTime.now()
     val sqlQuery = (name, quantity, price) match {
       case (Some(name), Some(quantity), Some(price)) =>
-        sql"UPDATE product SET name = $name, quantity = $quantity, price = $price WHERE id=$id"
+        sql"UPDATE product SET name = $name, quantity = $quantity, price = $price, updated_at = $updatedAt WHERE id=$id"
       case (Some(name), Some(quantity), None) =>
-        sql"UPDATE product SET name = $name, quantity = $quantity WHERE id=$id"
+        sql"UPDATE product SET name = $name, quantity = $quantity, updated_at = $updatedAt WHERE id=$id"
       case (Some(name), None, None) =>
-        sql"UPDATE product SET name = $name WHERE id=$id"
+        sql"UPDATE product SET name = $name, updated_at = $updatedAt WHERE id=$id"
       case (Some(name), None, Some(price)) =>
-        sql"UPDATE product SET name = $name, price = $price WHERE id=$id"
+        sql"UPDATE product SET name = $name, price = $price, updated_at = $updatedAt WHERE id=$id"
       case (None, None, None) =>
         sql""
       case (None, Some(quantity), Some(price)) =>
-        sql"UPDATE product SET quantity = $quantity, price = $price WHERE id=$id"
+        sql"UPDATE product SET quantity = $quantity, price, updated_at = $updatedAt = $price WHERE id=$id"
       case (None, None, Some(price)) =>
-        sql"UPDATE product SET  price = $price WHERE id=$id"
+        sql"UPDATE product SET  price = $price, updated_at = $updatedAt WHERE id=$id"
       case (None, Some(quantity), None) =>
-        sql"UPDATE product SET quantity = $quantity WHERE id=$id"
+        sql"UPDATE product SET quantity = $quantity, updated_at = $updatedAt WHERE id=$id"
     }
     sqlQuery.update
       .withUniqueGeneratedKeys("id", "name", "quantity", "price")
