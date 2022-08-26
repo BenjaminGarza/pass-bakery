@@ -54,7 +54,7 @@ class BakeryDB {
       name: Option[String],
       quantity: Option[Int],
       price: Option[Double]
-  ): Unit = {
+  ): Int = {
     val updatedAt = LocalDateTime.now()
     val sqlQuery = (name, quantity, price) match {
       case (Some(name), Some(quantity), Some(price)) =>
@@ -74,8 +74,7 @@ class BakeryDB {
       case (None, Some(quantity), None) =>
         sql"UPDATE product SET quantity = $quantity, updated_at = $updatedAt WHERE id=$id"
     }
-    sqlQuery.update
-      .withUniqueGeneratedKeys("id", "name", "quantity", "price")
+    sqlQuery.update.run
       .transact(xa)
       .unsafeRunSync()
   }
