@@ -1,7 +1,6 @@
 package controllers
 
 import services._
-import io.circe.generic.codec.DerivedAsObjectCodec.deriveCodec
 import io.circe.syntax.EncoderOps
 import io.circe._
 
@@ -10,6 +9,7 @@ import play.api._
 import play.api.mvc._
 import DAO.BakeryDB
 import io.circe
+import models.{ProductFromJson, ServiceStatus}
 
 import java.util.UUID
 
@@ -21,7 +21,7 @@ class APIController @Inject() (
 ) extends BaseController {
 
   def statusToJson: String = {
-    val status = models.Status(
+    val status = ServiceStatus(
       "pass-bakery",
       environment.mode.toString,
       APIService.getDateTime
@@ -33,20 +33,15 @@ class APIController @Inject() (
     val parseResult: Option[ProductFromJson] = {
       request.body.asText match {
         case None =>
-          println("asText failed")
           None
         case Some(rawText) => {
-          println(rawText)
           circe.parser.parse(rawText) match {
             case Left(failure) =>
-              println("Parser failed")
               None
             case Right(json) =>
-              println(json.toString())
               parser
                 .decode[ProductFromJson](json.toString()) match {
                 case Left(error) =>
-                  println(error)
                   None
                 case Right(product) => Some(product)
               }
@@ -55,20 +50,6 @@ class APIController @Inject() (
       }
     }
     parseResult
-  }
-  case class ProductFromJson(
-      name: Option[String],
-      quantity: Option[Int],
-      price: Option[Double]
-  )
-  object ProductFromJson {
-    implicit val decoder: Decoder[ProductFromJson] = (c: HCursor) => {
-      for {
-        name <- c.downField("name").as[Option[String]]
-        quantity <- c.downField("quantity").as[Option[Int]]
-        price <- c.downField("price").as[Option[Double]]
-      } yield new ProductFromJson(name, quantity, price)
-    }
   }
 
   def serviceStatus(): Action[AnyContent] = Action {
@@ -87,9 +68,8 @@ class APIController @Inject() (
               product.name.get,
               product.quantity.get,
               product.price.get
-            ) //Need to properly setup getOrElse here
+            )
           Ok("Post successful, " ++ rowsUpdated.toString ++ " rows updated")
-          Ok("Work in progress")
       }
   }
   def findByID(id: UUID): Action[AnyContent] = Action {
@@ -121,7 +101,7 @@ class APIController @Inject() (
                 product.quantity,
                 product.price
               )
-              Ok("")
+              Ok(rowsModified.toString)
           }
       }
   }

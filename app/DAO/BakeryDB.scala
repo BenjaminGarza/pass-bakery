@@ -2,15 +2,11 @@ package DAO
 
 import doobie._
 import doobie.implicits._
-import doobie.implicits.javasql._
 import cats.effect.IO
-import doobie.util.ExecutionContexts
-import cats.implicits
 import doobie.postgres.implicits._
-import doobie.postgres.pgisimplicits._
+import models.Product
 import cats.effect.unsafe.implicits.global
-
-import java.time.{LocalDateTime, OffsetDateTime}
+import java.time.{LocalDateTime}
 import java.util.UUID
 
 class BakeryDB {
@@ -20,15 +16,6 @@ class BakeryDB {
     "jdbc:postgresql://localhost:5500/bakerydb",
     "postgres",
     "pass"
-  )
-
-  case class Product(
-      id: String,
-      name: String,
-      quantity: Int,
-      price: Double,
-      createdAt: OffsetDateTime,
-      updatedAt: OffsetDateTime
   )
 
   def addProduct(
@@ -67,26 +54,27 @@ class BakeryDB {
       name: Option[String],
       quantity: Option[Int],
       price: Option[Double]
-  ): Option[Product] = {
-    val nameFragment = name.getOrElse(None) match {
-      case None       => ""
-      case Some(name) => " ,".concat(name.toString)
+  ): Unit = {
+    val sqlQuery = (name, quantity, price) match {
+      case (Some(name), Some(quantity), Some(price)) =>
+        sql"UPDATE product SET name = $name, quantity = $quantity, price = $price WHERE id=$id"
+      case (Some(name), Some(quantity), None) =>
+        sql"UPDATE product SET name = $name, quantity = $quantity WHERE id=$id"
+      case (Some(name), None, None) =>
+        sql"UPDATE product SET name = $name WHERE id=$id"
+      case (Some(name), None, Some(price)) =>
+        sql"UPDATE product SET name = $name, price = $price WHERE id=$id"
+      case (None, None, None) =>
+        sql""
+      case (None, Some(quantity), Some(price)) =>
+        sql"UPDATE product SET quantity = $quantity, price = $price WHERE id=$id"
+      case (None, None, Some(price)) =>
+        sql"UPDATE product SET  price = $price WHERE id=$id"
+      case (None, Some(quantity), None) =>
+        sql"UPDATE product SET quantity = $quantity WHERE id=$id"
     }
-    val quantityFragment = quantity.getOrElse(None) match {
-      case None           => ""
-      case Some(quantity) => " ,".concat(quantity.toString)
-    }
-    val priceFragment = price.getOrElse(None) match {
-      case None        => ""
-      case Some(price) => " ,".concat(price.toString)
-    }
-
-    println(
-      sql"UPDATE Product SET $nameFragment $quantityFragment $priceFragment WHERE id=$id"
-    )
-    sql"UPDATE Product SET $nameFragment $quantityFragment $priceFragment WHERE id=$id"
-      .query[Product]
-      .option
+    sqlQuery.update
+      .withUniqueGeneratedKeys("id", "name", "quantity", "price")
       .transact(xa)
       .unsafeRunSync()
   }

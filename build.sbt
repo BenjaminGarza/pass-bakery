@@ -25,3 +25,4 @@ libraryDependencies ++= Seq(evolutions, jdbc)
 libraryDependencies ++= Seq(
   "org.scalatestplus.play" %% "scalatestplus-play" % "3.0.x" % "test"
 )
+libraryDependencies += "net.postgis" % "postgis-jdbc" % "2.3.0"
