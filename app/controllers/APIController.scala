@@ -61,6 +61,15 @@ class APIController @Inject() (
       quantity: Option[Int],
       price: Option[Double]
   )
+  object ProductFromJson {
+    implicit val decoder: Decoder[ProductFromJson] = (c: HCursor) => {
+      for {
+        name <- c.downField("name").as[Option[String]]
+        quantity <- c.downField("quantity").as[Option[Int]]
+        price <- c.downField("price").as[Option[Double]]
+      } yield new ProductFromJson(name, quantity, price)
+    }
+  }
 
   def serviceStatus(): Action[AnyContent] = Action {
     implicit request: Request[AnyContent] =>
