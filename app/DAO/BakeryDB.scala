@@ -6,16 +6,20 @@ import cats.effect.IO
 import doobie.postgres.implicits._
 import models.Product
 import cats.effect.unsafe.implicits.global
-import java.time.{LocalDateTime}
-import java.util.UUID
+import play.api.Configuration
+import play.api.db.Database
 
-class BakeryDB {
+import java.time.LocalDateTime
+import java.util.UUID
+import javax.inject._
+
+class BakeryDB @Inject() (config: Configuration, db: Database) {
 
   val xa = Transactor.fromDriverManager[IO](
-    "org.postgresql.Driver",
-    "jdbc:postgresql://localhost:5500/bakerydb",
-    "postgres",
-    "pass"
+    config.get[String]("db.default.driver"),
+    config.get[String]("db.default.url"),
+    config.get[String]("db.default.username"),
+    config.get[String]("db.default.password")
   )
 
   def addProduct(
