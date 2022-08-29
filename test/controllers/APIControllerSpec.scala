@@ -1,20 +1,17 @@
 package controllers
 
-import org.scalatest.MustMatchers.convertToAnyMustWrapper
+import DAO.BakeryDB
 import org.scalatestplus.play._
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
-import play.api.db.Database
-import play.api.libs.ws.WSClient
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import play.api.mvc._
-
 import java.time.LocalDate
 import java.util.UUID
 import scala.concurrent.Future
 import scala.language.postfixOps
 
-class APIControllerSpec
+class APIControllerSpec(bakeryDB: BakeryDB)
     extends PlaySpec
     with Results
     with GuiceOneAppPerTest
@@ -113,5 +110,29 @@ class APIControllerSpec
       bodyText must include(LocalDate.now().toString)
     }
   }
+  "Delete product" should {
+    "Return successful" in {
+      val controller = inject[APIController]
+      val name = "l@at&te9008865"
+      val setUp: Future[Result] = controller
+        .postProduct()
+        .apply(
+          FakeRequest(
+            POST,
+            "/pass-bakery/product"
+          ).withTextBody(
+            text =
+              "{\"name\": \"l@at&te9008865\", \"quantity\": \"9\", \"price\": \"8.99\"}"
+          )
+        )
+      val findByName = bakeryDB.findByName(name)
+      val result = findByName match {
+        case None => "Nothing here"
+        case Some(product) =>
+          controller.deleteByID(product.id).toString()
+      }
+      result must include("1 row deleted")
 
+    }
+  }
 }

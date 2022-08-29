@@ -4,9 +4,10 @@ import io.circe.{Decoder, Encoder}
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 
 import java.time.OffsetDateTime
+import java.util.UUID
 
 case class Product(
-    id: String,
+    id: UUID,
     name: String,
     quantity: Int,
     price: Double,

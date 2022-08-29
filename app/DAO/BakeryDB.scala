@@ -45,6 +45,14 @@ class BakeryDB @Inject() (config: Configuration, db: Database) {
       .unsafeRunSync()
   }
 
+  def findByName(name: String): Option[Product] = {
+    sql"SELECT * FROM Product WHERE name=$name"
+      .query[Product]
+      .option
+      .transact(xa)
+      .unsafeRunSync()
+  }
+
   def findAll(): List[Product] = {
     sql"SELECT * FROM Product"
       .query[Product]
