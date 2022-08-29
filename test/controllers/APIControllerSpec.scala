@@ -8,7 +8,9 @@ import play.api.libs.ws.WSClient
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import play.api.mvc._
+
 import java.time.LocalDate
+import java.util.UUID
 import scala.concurrent.Future
 import scala.language.postfixOps
 
@@ -26,7 +28,7 @@ class APIControllerSpec
         .apply(
           FakeRequest(
             POST,
-            "/pass-bakery/status"
+            "/pass-bakery/product"
           ).withTextBody(
             text =
               "{\"name\": \"crepe\", \"quantity\": \"5\", \"price\": \"4.99\"}"
@@ -44,18 +46,52 @@ class APIControllerSpec
           .apply(
             FakeRequest(
               POST,
-              "/pass-bakery/status"
+              "/pass-bakery/product"
             ).withTextBody(
               text = "{}"
             )
           )
       }
-
     }
+  }
+  "Edit product" should {
+    "Return successful" in {
+      val controller = inject[APIController]
+      val uuid: UUID = UUID.fromString("a62bf2f7-732d-47a0-b791-3140784784b0")
+      val result: Future[Result] = controller
+        .editByID(uuid)
+        .apply(
+          FakeRequest(
+            PUT,
+            " http://localhost:9000/rest/bakery/product/a62bf2f7-732d-47a0-b791-3140784784b0"
+          ).withTextBody(
+            text = "{\"name\": \"crepe\", \"price\": \"9.99\"}"
+          )
+        )
 
+      val bodyText: String = contentAsString(result)
+      bodyText mustBe ("1")
+    }
+    "Return unsuccessful" in {
+
+      val controller = inject[APIController]
+      val uuid: UUID = UUID.fromString("a62bf2f7-732d-47a0-b791-3140784704b0")
+      val result: Future[Result] = controller
+        .editByID(uuid)
+        .apply(
+          FakeRequest(
+            PUT,
+            "/pass-bakery/product"
+          ).withTextBody(
+            text = "{\"name\": \"crepe\", \"price\": \"9.99\"}"
+          )
+        )
+      val bodyText: String = contentAsString(result)
+      bodyText mustBe ("Product not found")
+    }
   }
   "findAllProducts" should {
-    "Should return Nil when table is empty" in {
+    "Should return success" in {
       val controller = inject[APIController]
       val result: Future[Result] = controller
         .findAllProducts()
