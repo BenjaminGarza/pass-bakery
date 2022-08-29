@@ -3,6 +3,8 @@ package controllers
 import org.scalatest.MustMatchers.convertToAnyMustWrapper
 import org.scalatestplus.play._
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import play.api.db.Database
+import play.api.libs.ws.WSClient
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import play.api.mvc._
@@ -15,6 +17,7 @@ class APIControllerSpec
     with Results
     with GuiceOneAppPerTest
     with Injecting {
+
   "Create product" should {
     "Return successful" in {
       val controller = inject[APIController]
@@ -29,9 +32,27 @@ class APIControllerSpec
               "{\"name\": \"crepe\", \"quantity\": \"5\", \"price\": \"4.99\"}"
           )
         )
+
       val bodyText: String = contentAsString(result)
       bodyText mustBe ("Post successful, 1 rows updated")
     }
+    "Return unsuccessful" in {
+      intercept[Exception] {
+        val controller = inject[APIController]
+        val result: Future[Result] = controller
+          .postProduct()
+          .apply(
+            FakeRequest(
+              POST,
+              "/pass-bakery/status"
+            ).withTextBody(
+              text = "{}"
+            )
+          )
+      }
+
+    }
+
   }
   "findAllProducts" should {
     "Should return Nil when table is empty" in {
@@ -41,7 +62,6 @@ class APIControllerSpec
         .apply(FakeRequest(GET, "/rest/bakery"))
       val bodyText: String = contentAsString(result)
       status(result) mustBe 200
-      bodyText must include("Nil")
     }
   }
   "Status endpoint" should {
