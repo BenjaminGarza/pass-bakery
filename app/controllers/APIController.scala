@@ -8,7 +8,6 @@ import javax.inject._
 import play.api._
 import play.api.mvc._
 import DAO.BakeryDB
-import io.circe
 import models.{ProductFromJson, ServiceStatus}
 
 import java.util.UUID
@@ -30,26 +29,16 @@ class APIController @Inject() (
   }
 
   def parseFromJson(request: Request[AnyContent]): Option[ProductFromJson] = {
-    val parseResult: Option[ProductFromJson] = {
-      request.body.asJson match {
-        case None =>
+    val parseResult: Option[ProductFromJson] =
+      parser.decode[ProductFromJson](request.body.toString) match {
+        case error =>
           None
-        case Some(rawText) => {
-          circe.parser.parse(rawText.toString()) match {
-            case Left(failure) =>
-              None
-            case Right(json) =>
-              parser
-                .decode[ProductFromJson](json.toString()) match {
-                case Left(error) =>
-                  None
-                case Right(product) => Some(product)
-              }
-          }
+        case Right(product) => {
+          Some(product)
         }
       }
-    }
     parseResult
+
   }
 
   def serviceStatus(): Action[AnyContent] = Action {
