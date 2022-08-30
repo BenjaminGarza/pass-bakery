@@ -8,7 +8,6 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 scalaVersion := "2.13.8"
 
 libraryDependencies ++= Seq(
-  // more dependencies here
   guice,
   "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % Test,
   "io.circe" %% "circe-generic-extras" % "0.12.2",
@@ -17,5 +16,7 @@ libraryDependencies ++= Seq(
   "org.tpolecat" %% "doobie-core" % "1.0.0-RC1",
   "org.tpolecat" %% "doobie-postgres" % "1.0.0-RC1",
   "org.scalatestplus.play" %% "scalatestplus-play" % "3.0.x" % "test",
-  "net.postgis" % "postgis-jdbc" % "2.3.0"
+  "net.postgis" % "postgis-jdbc" % "2.3.0",
+  evolutions,
+  jdbc
 )
