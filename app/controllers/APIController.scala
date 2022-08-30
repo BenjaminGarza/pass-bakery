@@ -31,11 +31,11 @@ class APIController @Inject() (
 
   def parseFromJson(request: Request[AnyContent]): Option[ProductFromJson] = {
     val parseResult: Option[ProductFromJson] = {
-      request.body.asText match {
+      request.body.asJson match {
         case None =>
           None
         case Some(rawText) => {
-          circe.parser.parse(rawText) match {
+          circe.parser.parse(rawText.toString()) match {
             case Left(failure) =>
               None
             case Right(json) =>
