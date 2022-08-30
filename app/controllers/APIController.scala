@@ -63,29 +63,23 @@ class APIController @Inject() (
         case None =>
           BadRequest("Post failed")
         case Some(product) =>
-          product.name match {
-            case None => BadRequest("Post failed on name")
-            case Some(name) =>
-              product.quantity match {
-                case None => BadRequest("Post failed on quantity")
-                case Some(quantity) =>
-                  product.price match {
-                    case None => BadRequest("Post failed on price")
-                    case Some(price) =>
-                      val rowsUpdated =
-                        bakeryDB.addProduct(
-                          name,
-                          quantity,
-                          price
-                        )
-                      Ok(
-                        "Post successful, " ++ rowsUpdated.toString ++ " rows updated"
-                      )
-                  }
-              }
+          (product.name, product.quantity, product.price) match {
+            case (Some(name), Some(quantity), Some(price)) =>
+              val rowsUpdated =
+                bakeryDB.addProduct(
+                  name,
+                  quantity,
+                  price
+                )
+              Ok(
+                "Post successful, " ++ rowsUpdated.toString ++ " rows updated"
+              )
+            case noMatch => BadRequest("Post failed")
           }
+
       }
   }
+
   def findByID(id: UUID): Action[AnyContent] = Action {
     implicit request: Request[AnyContent] =>
       bakeryDB.findByID(id) match {
