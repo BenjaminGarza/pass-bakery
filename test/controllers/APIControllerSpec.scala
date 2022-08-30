@@ -17,8 +17,8 @@ class APIControllerSpec(bakeryDB: BakeryDB)
     with GuiceOneAppPerTest
     with Injecting {
 
-  "Create product" should {
-    "Return successful" in {
+  "postProduct method" should {
+    "Return successful when adding a product with all needed values" in {
       val controller = inject[APIController]
       val result: Future[Result] = controller
         .postProduct()
@@ -35,7 +35,7 @@ class APIControllerSpec(bakeryDB: BakeryDB)
       val bodyText: String = contentAsString(result)
       bodyText mustBe ("Post successful, 1 rows updated")
     }
-    "Return unsuccessful" in {
+    "Return unsuccessful when trying to add a product with no values" in {
       intercept[Exception] {
         val controller = inject[APIController]
         val result: Future[Result] = controller
@@ -51,8 +51,8 @@ class APIControllerSpec(bakeryDB: BakeryDB)
       }
     }
   }
-  "Edit product" should {
-    "Return successful" in {
+  "Edit product method" should {
+    "Return successful when passing in the ID and some values" in {
       val controller = inject[APIController]
       val uuid: UUID = UUID.fromString("a62bf2f7-732d-47a0-b791-3140784784b0")
       val result: Future[Result] = controller
@@ -69,7 +69,7 @@ class APIControllerSpec(bakeryDB: BakeryDB)
       val bodyText: String = contentAsString(result)
       bodyText mustBe ("1")
     }
-    "Return unsuccessful" in {
+    "Return unsuccessful when passing in an invalid ID" in {
 
       val controller = inject[APIController]
       val uuid: UUID = UUID.fromString("a62bf2f7-732d-47a0-b791-3140784704b0")
@@ -88,17 +88,18 @@ class APIControllerSpec(bakeryDB: BakeryDB)
     }
   }
   "findAllProducts" should {
-    "Should return success" in {
+    "Should return Ok and the current products" in {
       val controller = inject[APIController]
       val result: Future[Result] = controller
         .findAllProducts()
         .apply(FakeRequest(GET, "/rest/bakery"))
       val bodyText: String = contentAsString(result)
       status(result) mustBe 200
+      bodyText must include("crepe")
     }
   }
   "Status endpoint" should {
-    "Should return status" in {
+    "Should return current service status on GET" in {
       val controller = inject[APIController]
       val result: Future[Result] = controller
         .serviceStatus()
@@ -111,7 +112,7 @@ class APIControllerSpec(bakeryDB: BakeryDB)
     }
   }
   "Delete product" should {
-    "Return successful" in {
+    "Return success when deleting a product from the database" in {
       val controller = inject[APIController]
       val name = "l@at&te9008865"
       val setUp: Future[Result] = controller
