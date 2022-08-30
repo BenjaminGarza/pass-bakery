@@ -8,19 +8,17 @@ import models.Product
 import cats.effect.unsafe.implicits.global
 import play.api.Configuration
 import play.api.db.Database
-
+import models.DBTransactor
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject._
 
-class BakeryDB @Inject() (config: Configuration, db: Database) {
-
-  val xa = Transactor.fromDriverManager[IO](
-    config.get[String]("db.default.driver"),
-    config.get[String]("db.default.url"),
-    config.get[String]("db.default.username"),
-    config.get[String]("db.default.password")
-  )
+class BakeryDB @Inject() (
+    config: Configuration,
+    db: Database,
+    dbTransactor: DBTransactor
+) {
+  val xa = dbTransactor.xa
 
   def addProduct(
       name: String,

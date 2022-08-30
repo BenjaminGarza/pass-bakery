@@ -1,6 +1,7 @@
 package controllers
 
 import DAO.BakeryDB
+import models.DBTransactor
 import org.scalatestplus.play._
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.test.Helpers._
@@ -10,14 +11,16 @@ import java.time.LocalDate
 import java.util.UUID
 import scala.concurrent.Future
 import scala.language.postfixOps
+import play.api.db.Databases
 
-class APIControllerSpec(bakeryDB: BakeryDB)
+class APIControllerSpec
     extends PlaySpec
     with Results
     with GuiceOneAppPerTest
     with Injecting {
 
   "postProduct method" should {
+
     "Return successful when adding a product with all needed values" in {
       val controller = inject[APIController]
       val result: Future[Result] = controller
@@ -52,6 +55,7 @@ class APIControllerSpec(bakeryDB: BakeryDB)
     }
   }
   "Edit product method" should {
+
     "Return successful when passing in the ID and some values" in {
       val controller = inject[APIController]
       val uuid: UUID = UUID.fromString("a62bf2f7-732d-47a0-b791-3140784784b0")
@@ -88,6 +92,7 @@ class APIControllerSpec(bakeryDB: BakeryDB)
     }
   }
   "findAllProducts" should {
+
     "Should return HTTP Status 200 and the current products" in {
       val controller = inject[APIController]
       val result: Future[Result] = controller
@@ -99,6 +104,7 @@ class APIControllerSpec(bakeryDB: BakeryDB)
     }
   }
   "Status endpoint" should {
+
     "Should return current service status on GET" in {
       val controller = inject[APIController]
       val result: Future[Result] = controller
@@ -112,6 +118,7 @@ class APIControllerSpec(bakeryDB: BakeryDB)
     }
   }
   "Delete product" should {
+
     "Return success when deleting a product from the database" in {
       val controller = inject[APIController]
       val name = "l@at&te9008865"
