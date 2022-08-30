@@ -88,7 +88,7 @@ class APIControllerSpec(bakeryDB: BakeryDB)
     }
   }
   "findAllProducts" should {
-    "Should return Ok and the current products" in {
+    "Should return HTTP Status 200 and the current products" in {
       val controller = inject[APIController]
       val result: Future[Result] = controller
         .findAllProducts()
@@ -132,7 +132,7 @@ class APIControllerSpec(bakeryDB: BakeryDB)
         case Some(product) =>
           controller.deleteByID(product.id).toString()
       }
-      result must include("1 row deleted")
+      result mustBe 200
 
     }
   }
