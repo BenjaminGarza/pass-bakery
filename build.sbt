@@ -4,6 +4,8 @@ organization := "com.example"
 version := "1.0-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
+javaOptions += "-Dconfig.file=conf/application/dev.conf"
+javaOptions in Test += "-Dconfig.file=conf/application/test.conf"
 
 scalaVersion := "2.13.8"
 
@@ -17,6 +19,7 @@ libraryDependencies ++= Seq(
   "org.tpolecat" %% "doobie-postgres" % "1.0.0-RC1",
   "org.scalatestplus.play" %% "scalatestplus-play" % "3.0.x" % "test",
   "net.postgis" % "postgis-jdbc" % "2.3.0",
+  "org.tpolecat" %% "doobie-h2" % "1.0.0-RC1",
   evolutions,
   jdbc,
   jdbc % Test

@@ -12,6 +12,10 @@ import java.util.UUID
 import scala.concurrent.Future
 import scala.language.postfixOps
 import play.api.db.Databases
+import play.api.db.Database
+import play.api.db.Databases
+import play.api.db.evolutions._
+import org.h2.tools.Server
 
 class APIControllerSpec
     extends PlaySpec
@@ -19,7 +23,22 @@ class APIControllerSpec
     with GuiceOneAppPerTest
     with Injecting {
 
+  val database = Databases(
+    driver = "org.h2.Driver",
+    url = "jdbc:h2:mem:play"
+  )
+
   "postProduct method" should {
+//    withDatabase { database =>
+//      val connection = database.getConnection()
+//      connection
+//        .prepareStatement("insert into test values (10, 'testing')")
+//        .execute()
+//
+//      connection
+//        .prepareStatement("")
+//        .executeQuery()
+//        .next()
 
     "Return successful when adding a product with all needed values" in {
       val controller = inject[APIController]
@@ -117,30 +136,32 @@ class APIControllerSpec
       bodyText must include(LocalDate.now().toString)
     }
   }
-  "Delete product" should {
-
-    "Return success when deleting a product from the database" in {
-      val controller = inject[APIController]
-      val name = "l@at&te9008865"
-      val setUp: Future[Result] = controller
-        .postProduct()
-        .apply(
-          FakeRequest(
-            POST,
-            "/pass-bakery/product"
-          ).withTextBody(
-            text =
-              "{\"name\": \"l@at&te9008865\", \"quantity\": \"9\", \"price\": \"8.99\"}"
-          )
-        )
-      val findByName = bakeryDB.findByName(name)
-      val result = findByName match {
-        case None => "Nothing here"
-        case Some(product) =>
-          controller.deleteByID(product.id).toString()
-      }
-      result mustBe 200
-
-    }
-  }
+//  "Delete product" should {
+//
+//    "Return success when deleting a product from the database" in {
+//      val controller = inject[APIController]
+//      val name = "l@at&te9008865"
+//      val setUp: Future[Result] = controller
+//        .postProduct()
+//        .apply(
+//          FakeRequest(
+//            POST,
+//            "/pass-bakery/product"
+//          ).withTextBody(
+//            text =
+//              "{\"name\": \"l@at&te9008865\", \"quantity\": \"9\", \"price\": \"8.99\"}"
+//          )
+//        )
+//      val findByName = bakeryDB.findByName(name)
+//      val result = findByName match {
+//        case None => "Nothing here"
+//        case Some(product) =>
+//          controller.deleteByID(product.id).toString()
+//      }
+//      result mustBe 200
+//
+//    }
+//  }
+  // stop the H2 DB TCP Server
+  database.shutdown()
 }
