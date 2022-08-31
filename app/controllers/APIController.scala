@@ -3,7 +3,6 @@ package controllers
 import services._
 import io.circe.syntax.EncoderOps
 import io.circe._
-
 import javax.inject._
 import play.api._
 import play.api.mvc._
@@ -28,10 +27,14 @@ class APIController @Inject() (
     status.asJson.spaces2
   }
 
-  def parseFromJson(request: Request[AnyContent]): Option[ProductFromJson] = {
+  def parseFromJson(
+      request: Request[AnyContent]
+  ): Option[ProductFromJson] = {
     val parseResult: Option[ProductFromJson] =
-      parser.decode[ProductFromJson](request.body.toString) match {
-        case error =>
+      parser.decode[ProductFromJson](
+        request.body.asInstanceOf[AnyContentAsJson].json.toString()
+      ) match {
+        case Left(error) =>
           None
         case Right(product) => {
           Some(product)

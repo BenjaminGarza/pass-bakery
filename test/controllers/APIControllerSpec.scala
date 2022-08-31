@@ -1,21 +1,16 @@
 package controllers
 
-import DAO.BakeryDB
-import models.DBTransactor
 import org.scalatestplus.play._
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.test.Helpers._
-import play.api.test.{FakeRequest, Injecting}
+import play.api.test.{FakeHeaders, FakeRequest, Injecting}
 import play.api.mvc._
 import java.time.LocalDate
 import java.util.UUID
 import scala.concurrent.Future
 import scala.language.postfixOps
 import play.api.db.Databases
-import play.api.db.Database
-import play.api.db.Databases
-import play.api.db.evolutions._
-import org.h2.tools.Server
+import play.api.libs.json.JsString
 
 class APIControllerSpec
     extends PlaySpec
@@ -29,17 +24,6 @@ class APIControllerSpec
   )
 
   "postProduct method" should {
-//    withDatabase { database =>
-//      val connection = database.getConnection()
-//      connection
-//        .prepareStatement("insert into test values (10, 'testing')")
-//        .execute()
-//
-//      connection
-//        .prepareStatement("")
-//        .executeQuery()
-//        .next()
-
     "Return successful when adding a product with all needed values" in {
       val controller = inject[APIController]
       val result: Future[Result] = controller
@@ -48,9 +32,10 @@ class APIControllerSpec
           FakeRequest(
             POST,
             "/pass-bakery/product"
-          ).withTextBody(
-            text =
+          ).withJsonBody(
+            JsString(
               "{\"name\": \"crepe\", \"quantity\": \"5\", \"price\": \"4.99\"}"
+            )
           )
         )
 
