@@ -1,6 +1,7 @@
 package controllers
 
 import akka.stream.Materializer
+import akka.util.ByteString
 import org.scalatestplus.play._
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.Play.materializer
@@ -13,6 +14,7 @@ import scala.concurrent.Future
 import scala.language.postfixOps
 import play.api.db.Databases
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.streams.Accumulator
 
 class APIControllerSpec
     extends PlaySpec
@@ -29,9 +31,9 @@ class APIControllerSpec
   )
 
   "postProduct method" should {
-    "Return successful when adding a product with all needed values" in {
+    "return successful when adding a product with all needed values" in {
       val controller = inject[APIController]
-      val result = controller
+      val result: Accumulator[ByteString, Result] = controller
         .postProduct()
         .apply(
           FakeRequest(
@@ -42,12 +44,11 @@ class APIControllerSpec
         )
       val runResult: Future[Result] = result.run()(mtrlzr)
 
-      val bodyText: String = contentAsString(runResult)
-      bodyText mustBe ("Post successful, 1 rows updated")
+      status(runResult) mustBe 200
     }
-    "Return unsuccessful when trying to add a product with no values" in {
+    "return unsuccessful when trying to add a product with no values" in {
       val controller = inject[APIController]
-      val result = controller
+      val result: Accumulator[ByteString, Result] = controller
         .postProduct()
         .apply(
           FakeRequest(
@@ -57,31 +58,29 @@ class APIControllerSpec
             .withHeaders(("Content-Type:", "application/json"))
         )
       val runResult: Future[Result] = result.run()(mtrlzr)
-      val bodyText: String = contentAsString(runResult)
-      bodyText mustBe ("Update failed")
+      status(runResult) mustBe 400
     }
   }
   "Edit product method" should {
 
-    "Return successful when passing in the ID and some values" in {
+    "return successful when passing in the ID and some values" in {
       val controller = inject[APIController]
       val uuid: UUID = UUID.fromString("a62bf2f7-732d-47a0-b791-3140784784b0")
 
-      val result = controller
+      val result: Accumulator[ByteString, Result] = controller
         .editByID(uuid)
         .apply(
           FakeRequest(
-            POST,
+            PUT,
             "/pass-bakery/product"
           ).withBody("""{"name": "crepe", "quantity": 5, "price": 4.99}""")
             .withHeaders(("Content-Type:", "application/json"))
         )
       val runResult: Future[Result] = result.run()(mtrlzr)
 
-      val bodyText: String = contentAsString(runResult)
-      bodyText mustBe ("1")
+      status(runResult) mustBe 200
     }
-    "Return unsuccessful when passing in an invalid ID" in {
+    "return unsuccessful when passing in an invalid ID" in {
 
       val controller = inject[APIController]
       val uuid: UUID = UUID.fromString("a62bf2f7-732d-47a0-b791-3140784704b0")
@@ -96,34 +95,29 @@ class APIControllerSpec
             .withHeaders(("Content-Type:", "application/json"))
         )
       val runResult: Future[Result] = result.run()(mtrlzr)
-      val bodyText: String = contentAsString(result)
-      bodyText mustBe ("Product not found")
+      status(runResult) mustBe 400
     }
   }
   "findAllProducts" should {
 
-    "Should return HTTP Status 200 and the current products" in {
+    "return HTTP Status 200 and the current products" in {
       val controller = inject[APIController]
       val result: Future[Result] = controller
         .findAllProducts()
         .apply(FakeRequest(GET, "/rest/bakery"))
       val bodyText: String = contentAsString(result)
       status(result) mustBe 200
-      bodyText must include("crepe")
     }
   }
   "Status endpoint" should {
 
-    "Should return current service status on GET" in {
+    "return current service status on GET" in {
       val controller = inject[APIController]
       val result: Future[Result] = controller
         .serviceStatus()
         .apply(FakeRequest(GET, "/pass-bakery/status"))
       val bodyText: String = contentAsString(result)
       status(result) mustBe 200
-      bodyText must include("pass-bakery")
-      bodyText must include("Test")
-      bodyText must include(LocalDate.now().toString)
     }
   }
 //  "Delete product" should {
