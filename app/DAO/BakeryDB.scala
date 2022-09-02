@@ -1,14 +1,12 @@
 package DAO
 
-import doobie._
-import doobie.implicits._
-import cats.effect.IO
-import doobie.postgres.implicits._
-import models.Product
 import cats.effect.unsafe.implicits.global
+import doobie.implicits._
+import doobie.postgres.implicits._
+import models.DBTransactor
+import models.Product
 import play.api.Configuration
 import play.api.db.Database
-import models.DBTransactor
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject._

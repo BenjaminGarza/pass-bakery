@@ -2,7 +2,6 @@ package models
 
 import io.circe.{Decoder, Encoder}
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
-
 import java.time.OffsetDateTime
 import java.util.UUID
 

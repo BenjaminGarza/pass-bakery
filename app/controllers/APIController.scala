@@ -1,14 +1,14 @@
 package controllers
 
-import services._
+import DAO.BakeryDB
 import io.circe.syntax.EncoderOps
-import javax.inject._
+import play.api.libs.circe.Circe
 import play.api._
 import play.api.mvc._
-import DAO.BakeryDB
 import models.{ProductFromJson, ServiceStatus}
-import play.api.libs.circe.Circe
+import services._
 import java.util.UUID
+import javax.inject._
 
 @Singleton
 class APIController @Inject() (
