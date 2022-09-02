@@ -2,16 +2,12 @@ package controllers
 
 import services._
 import io.circe.syntax.EncoderOps
-import io.circe._
-
 import javax.inject._
 import play.api._
 import play.api.mvc._
 import DAO.BakeryDB
-import io.circe.generic.codec.DerivedAsObjectCodec.deriveCodec
 import models.{ProductFromJson, ServiceStatus}
 import play.api.libs.circe.Circe
-
 import java.util.UUID
 
 @Singleton
