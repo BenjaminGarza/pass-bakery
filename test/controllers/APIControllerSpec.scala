@@ -100,7 +100,7 @@ class APIControllerSpec
   }
   "findAllProducts" should {
 
-    "return HTTP Status 200 and the current products" in {
+    "return HTTP Status 200 when retrieving all products" in {
       val controller = inject[APIController]
       val result: Future[Result] = controller
         .findAllProducts()
