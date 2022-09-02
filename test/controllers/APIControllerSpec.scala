@@ -1,7 +1,9 @@
 package controllers
 
+import akka.stream.Materializer
 import org.scalatestplus.play._
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import play.api.Play.materializer
 import play.api.test.Helpers._
 import play.api.test.{FakeHeaders, FakeRequest, Injecting}
 import play.api.mvc._
@@ -10,13 +12,16 @@ import java.util.UUID
 import scala.concurrent.Future
 import scala.language.postfixOps
 import play.api.db.Databases
-import play.api.libs.json.JsString
+import play.api.inject.guice.GuiceApplicationBuilder
 
 class APIControllerSpec
     extends PlaySpec
     with Results
     with GuiceOneAppPerTest
     with Injecting {
+
+  def mockApp = new GuiceApplicationBuilder().build()
+  val mtrlzr = mockApp.injector.instanceOf[Materializer]
 
   val database = Databases(
     driver = "org.h2.Driver",
@@ -26,36 +31,34 @@ class APIControllerSpec
   "postProduct method" should {
     "Return successful when adding a product with all needed values" in {
       val controller = inject[APIController]
-      val result: Future[Result] = controller
+      val result = controller
         .postProduct()
         .apply(
           FakeRequest(
             POST,
             "/pass-bakery/product"
-          ).withJsonBody(
-            JsString(
-              "{\"name\": \"crepe\", \"quantity\": \"5\", \"price\": \"4.99\"}"
-            )
-          )
+          ).withBody("""{"name": "crepe", "quantity": 5, "price": 4.99}""")
+            .withHeaders(("Content-Type:", "application/json"))
         )
+      val runResult: Future[Result] = result.run()(mtrlzr)
 
-      val bodyText: String = contentAsString(result)
+      val bodyText: String = contentAsString(runResult)
       bodyText mustBe ("Post successful, 1 rows updated")
     }
     "Return unsuccessful when trying to add a product with no values" in {
-      intercept[Exception] {
-        val controller = inject[APIController]
-        val result: Future[Result] = controller
-          .postProduct()
-          .apply(
-            FakeRequest(
-              POST,
-              "/pass-bakery/product"
-            ).withTextBody(
-              text = "{}"
-            )
-          )
-      }
+      val controller = inject[APIController]
+      val result = controller
+        .postProduct()
+        .apply(
+          FakeRequest(
+            POST,
+            "/pass-bakery/product"
+          ).withBody("""""")
+            .withHeaders(("Content-Type:", "application/json"))
+        )
+      val runResult: Future[Result] = result.run()(mtrlzr)
+      val bodyText: String = contentAsString(runResult)
+      bodyText mustBe ("Update failed")
     }
   }
   "Edit product method" should {
@@ -63,34 +66,36 @@ class APIControllerSpec
     "Return successful when passing in the ID and some values" in {
       val controller = inject[APIController]
       val uuid: UUID = UUID.fromString("a62bf2f7-732d-47a0-b791-3140784784b0")
-      val result: Future[Result] = controller
+
+      val result = controller
         .editByID(uuid)
         .apply(
           FakeRequest(
-            PUT,
-            " http://localhost:9000/rest/bakery/product/a62bf2f7-732d-47a0-b791-3140784784b0"
-          ).withTextBody(
-            text = "{\"name\": \"crepe\", \"price\": \"9.99\"}"
-          )
+            POST,
+            "/pass-bakery/product"
+          ).withBody("""{"name": "crepe", "quantity": 5, "price": 4.99}""")
+            .withHeaders(("Content-Type:", "application/json"))
         )
+      val runResult: Future[Result] = result.run()(mtrlzr)
 
-      val bodyText: String = contentAsString(result)
+      val bodyText: String = contentAsString(runResult)
       bodyText mustBe ("1")
     }
     "Return unsuccessful when passing in an invalid ID" in {
 
       val controller = inject[APIController]
       val uuid: UUID = UUID.fromString("a62bf2f7-732d-47a0-b791-3140784704b0")
-      val result: Future[Result] = controller
+
+      val result = controller
         .editByID(uuid)
         .apply(
           FakeRequest(
-            PUT,
+            POST,
             "/pass-bakery/product"
-          ).withTextBody(
-            text = "{\"name\": \"crepe\", \"price\": \"9.99\"}"
-          )
+          ).withBody("""{"name": "crepe", "quantity": 5, "price": 4.99}""")
+            .withHeaders(("Content-Type:", "application/json"))
         )
+      val runResult: Future[Result] = result.run()(mtrlzr)
       val bodyText: String = contentAsString(result)
       bodyText mustBe ("Product not found")
     }
