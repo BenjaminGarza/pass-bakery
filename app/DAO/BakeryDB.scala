@@ -1,6 +1,7 @@
 package DAO
 
 import cats.effect.unsafe.implicits.global
+import controllers.ControllerExecutionContext
 import doobie.implicits._
 import doobie.postgres.implicits._
 import models.DBTransactor
@@ -10,11 +11,13 @@ import play.api.db.Database
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject._
+import scala.concurrent.{ExecutionContext, Future}
 
 class BakeryDB @Inject() (
     config: Configuration,
     db: Database,
-    dbTransactor: DBTransactor
+    dbTransactor: DBTransactor,
+    implicit val controllerExecutionContext: ControllerExecutionContext
 ) {
   val xa = dbTransactor.xa
 
@@ -22,7 +25,7 @@ class BakeryDB @Inject() (
       name: String,
       quantity: Int,
       price: Double
-  ): Int = {
+  ): Future[Int] = {
     val createdAt = LocalDateTime.now()
     val insertStatement = {
       sql"INSERT INTO product (id, name, quantity, price, created_at, updated_at) VALUES (gen_random_uuid(), $name, $quantity, $price, $createdAt, $createdAt)"
@@ -30,31 +33,31 @@ class BakeryDB @Inject() (
 
     insertStatement.update.run
       .transact(xa)
-      .unsafeRunSync()
+      .unsafeToFuture()
   }
 
-  def findByID(id: UUID): Option[Product] = {
+  def findByID(id: UUID): Future[Option[Product]] = {
     sql"SELECT * FROM Product WHERE id=$id"
       .query[Product]
       .option
       .transact(xa)
-      .unsafeRunSync()
+      .unsafeToFuture()
   }
 
-  def findByName(name: String): Option[Product] = {
+  def findByName(name: String): Future[Option[Product]] = {
     sql"SELECT * FROM Product WHERE name=$name"
       .query[Product]
       .option
       .transact(xa)
-      .unsafeRunSync()
+      .unsafeToFuture()
   }
 
-  def findAll(): List[Product] = {
+  def findAll(): Future[List[Product]] = {
     sql"SELECT * FROM Product"
       .query[Product]
       .to[List]
       .transact(xa)
-      .unsafeRunSync()
+      .unsafeToFuture()
   }
 
   def editByID(
@@ -62,7 +65,7 @@ class BakeryDB @Inject() (
       name: Option[String],
       quantity: Option[Int],
       price: Option[Double]
-  ): Int = {
+  ): Future[Int] = {
     val updatedAt = LocalDateTime.now()
     val sqlQuery = (name, quantity, price) match {
       case (Some(name), Some(quantity), Some(price)) =>
@@ -84,13 +87,13 @@ class BakeryDB @Inject() (
     }
     sqlQuery.update.run
       .transact(xa)
-      .unsafeRunSync()
+      .unsafeToFuture()
   }
 
-  def deleteByID(id: UUID): Int = {
+  def deleteByID(id: UUID): Future[Int] = {
     sql"DELETE FROM Product WHERE id=$id".update.run
       .transact(xa)
-      .unsafeRunSync()
+      .unsafeToFuture()
   }
 
 }

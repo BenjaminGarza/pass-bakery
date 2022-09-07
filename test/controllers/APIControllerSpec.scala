@@ -19,7 +19,8 @@ class APIControllerSpec
     extends PlaySpec
     with Results
     with GuiceOneAppPerTest
-    with Injecting {
+    with Injecting
+    with ControllerExecutionContext {
 
   def mockApp = new GuiceApplicationBuilder().build()
   val mtrlzr = mockApp.injector.instanceOf[Materializer]
@@ -145,6 +146,5 @@ class APIControllerSpec
 //
 //    }
 //  }
-  // stop the H2 DB TCP Server
   database.shutdown()
 }

@@ -9,7 +9,8 @@ import play.api.test.Helpers._
 class HomeControllerSpec
     extends PlaySpec
     with GuiceOneAppPerTest
-    with Injecting {
+    with Injecting
+    with HomeControllerExecutionContext {
 
   "HomeController GET" should {
 
