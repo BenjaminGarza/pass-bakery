@@ -18,19 +18,12 @@ import services._
 import java.util.UUID
 import javax.inject._
 
-@ImplementedBy(classOf[ControllerExecutionContextImpl])
-trait ControllerExecutionContext extends ExecutionContext
-
-class ControllerExecutionContextImpl @Inject() (system: ActorSystem)
-    extends CustomExecutionContext(system, "my.executor")
-    with ControllerExecutionContext
-
 @Singleton
 class APIController @Inject() (
     environment: Environment,
     val controllerComponents: ControllerComponents,
     bakeryDB: BakeryDB,
-    implicit val controllerExecutionContext: ControllerExecutionContext
+    implicit val executionContext: ExecutionContext
 ) extends BaseController
     with Circe {
 

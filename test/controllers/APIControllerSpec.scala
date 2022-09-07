@@ -8,8 +8,9 @@ import play.api.Play.materializer
 import play.api.test.Helpers._
 import play.api.test.{FakeHeaders, FakeRequest, Injecting}
 import play.api.mvc._
+
 import java.util.UUID
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
 import play.api.db.Databases
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -19,8 +20,7 @@ class APIControllerSpec
     extends PlaySpec
     with Results
     with GuiceOneAppPerTest
-    with Injecting
-    with ControllerExecutionContext {
+    with Injecting {
 
   def mockApp = new GuiceApplicationBuilder().build()
   val mtrlzr = mockApp.injector.instanceOf[Materializer]

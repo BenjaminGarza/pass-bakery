@@ -1,7 +1,6 @@
 package DAO
 
 import cats.effect.unsafe.implicits.global
-import controllers.ControllerExecutionContext
 import doobie.implicits._
 import doobie.postgres.implicits._
 import models.DBTransactor
@@ -17,7 +16,7 @@ class BakeryDB @Inject() (
     config: Configuration,
     db: Database,
     dbTransactor: DBTransactor,
-    implicit val controllerExecutionContext: ControllerExecutionContext
+    implicit val executionContext: ExecutionContext
 ) {
   val xa = dbTransactor.xa
 
