@@ -2,6 +2,9 @@ package controllers
 
 import akka.stream.Materializer
 import akka.util.ByteString
+import io.circe.{Json, JsonObject}
+import io.circe.syntax.EncoderOps
+import models.ProductFromJson
 import org.scalatestplus.play._
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.Play.materializer
@@ -33,14 +36,17 @@ class APIControllerSpec
   "postProduct method" should {
     "return successful when adding a product with all needed values" in {
       val controller = inject[APIController]
+      val product = ProductFromJson(Some("crepe"), Some(5), Some(4.99)).asJson
+      val fakeRequest = FakeRequest(
+        POST,
+        controllers.routes.APIController.postProduct().url
+      ).withBody(product)
+        .withHeaders(("Content-Type" -> "application/json"))
+
       val result: Accumulator[ByteString, Result] = controller
         .postProduct()
         .apply(
-          FakeRequest(
-            POST,
-            "/pass-bakery/product"
-          ).withBody("""{"name": "crepe", "quantity": 5, "price": 4.99}""")
-            .withHeaders(("Content-Type:", "application/json"))
+          fakeRequest
         )
       val runResult: Future[Result] = result.run()(mtrlzr)
 
@@ -48,16 +54,20 @@ class APIControllerSpec
     }
     "return unsuccessful when trying to add a product with no values" in {
       val controller = inject[APIController]
+      val product = ProductFromJson(None, None, None).asJson
+      val fakeRequest = FakeRequest(
+        POST,
+        controllers.routes.APIController.postProduct().url
+      ).withBody(product)
+        .withHeaders(("Content-Type" -> "application/json"))
+
       val result: Accumulator[ByteString, Result] = controller
         .postProduct()
         .apply(
-          FakeRequest(
-            POST,
-            "/pass-bakery/product"
-          ).withBody("""""")
-            .withHeaders(("Content-Type:", "application/json"))
+          fakeRequest
         )
       val runResult: Future[Result] = result.run()(mtrlzr)
+
       status(runResult) mustBe 400
     }
   }
@@ -65,16 +75,19 @@ class APIControllerSpec
 
     "return successful when passing in the ID and some values" in {
       val controller = inject[APIController]
+
       val uuid: UUID = UUID.fromString("a62bf2f7-732d-47a0-b791-3140784784b0")
+      val product = ProductFromJson(None, Some(5), Some(4.99)).asJson
+      val fakeRequest = FakeRequest(
+        POST,
+        controllers.routes.APIController.editByID(uuid).url
+      ).withBody(product)
+        .withHeaders(("Content-Type" -> "application/json"))
 
       val result: Accumulator[ByteString, Result] = controller
         .editByID(uuid)
         .apply(
-          FakeRequest(
-            PUT,
-            "/pass-bakery/product"
-          ).withBody("""{"name": "crepe", "quantity": 5, "price": 4.99}""")
-            .withHeaders(("Content-Type:", "application/json"))
+          fakeRequest
         )
       val runResult: Future[Result] = result.run()(mtrlzr)
 

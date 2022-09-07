@@ -47,14 +47,15 @@ class APIController @Inject() (
         val product = request.body
         (product.name, product.quantity, product.price) match {
           case (Some(name), Some(quantity), Some(price)) =>
-            val rowsUpdated =
+            val rowsUpdated = {
               bakeryDB.addProduct(
                 name,
                 quantity,
                 price
               )
+            }
             Ok(
-              "Post successful, " ++ rowsUpdated.toString ++ " rows updated"
+              "Post successful"
             )
           case noMatch => BadRequest("Post failed")
 
