@@ -1,22 +1,15 @@
 package controllers
 
 import DAO.BakeryDB
-import akka.actor.ActorSystem
-import com.google.inject.ImplementedBy
-
-import scala.util.{Failure, Success}
 import io.circe.syntax.EncoderOps
+import java.util.UUID
+import javax.inject._
+import models.{ProductFromJson, ServiceStatus}
 import play.api.libs.circe.Circe
 import play.api._
 import play.api.mvc._
-import play.api.libs.concurrent.CustomExecutionContext
-import models.{ProductFromJson, ServiceStatus}
-
 import scala.concurrent.{ExecutionContext, Future}
 import services._
-
-import java.util.UUID
-import javax.inject._
 
 @Singleton
 class APIController @Inject() (
@@ -52,10 +45,7 @@ class APIController @Inject() (
               quantity,
               price
             )
-
-            Ok(
-              "Post successful"
-            )
+            Ok("Post successful")
           case (Some(name), Some(quantity), Some(price), Some(uuid)) =>
             bakeryDB.addProductWithUUID(
               name,
@@ -63,12 +53,8 @@ class APIController @Inject() (
               price,
               uuid
             )
-
-            Ok(
-              "Post with uuid successful"
-            )
+            Ok("Post with uuid successful")
           case noMatch => BadRequest("Post failed")
-
         }
       }
     }
@@ -81,7 +67,6 @@ class APIController @Inject() (
         case Some(product) =>
           Ok(product.asJson.spaces2)
       }
-
   }
 
   def findAllProducts(): Action[AnyContent] = Action.async {
@@ -91,7 +76,6 @@ class APIController @Inject() (
         .map { products =>
           Ok(products.asJson.spaces2)
         }
-
   }
 
   def editByID(id: UUID): Action[ProductFromJson] =
