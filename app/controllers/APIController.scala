@@ -45,8 +45,8 @@ class APIController @Inject() (
     Action.async(circe.tolerantJson[ProductFromJson]) { request =>
       Future {
         val product = request.body
-        (product.name, product.quantity, product.price) match {
-          case (Some(name), Some(quantity), Some(price)) =>
+        (product.name, product.quantity, product.price, product.uuid) match {
+          case (Some(name), Some(quantity), Some(price), None) =>
             bakeryDB.addProduct(
               name,
               quantity,
@@ -55,6 +55,17 @@ class APIController @Inject() (
 
             Ok(
               "Post successful"
+            )
+          case (Some(name), Some(quantity), Some(price), Some(uuid)) =>
+            bakeryDB.addProductWithUUID(
+              name,
+              quantity,
+              price,
+              uuid
+            )
+
+            Ok(
+              "Post with uuid successful"
             )
           case noMatch => BadRequest("Post failed")
 

@@ -35,6 +35,22 @@ class BakeryDB @Inject() (
       .unsafeToFuture()
   }
 
+  def addProductWithUUID(
+      name: String,
+      quantity: Int,
+      price: Double,
+      uuid: UUID
+  ): Future[Int] = {
+    val createdAt = LocalDateTime.now()
+    val insertStatement = {
+      sql"INSERT INTO product (id, name, quantity, price, created_at, updated_at) VALUES ($uuid, $name, $quantity, $price, $createdAt, $createdAt)"
+    }
+
+    insertStatement.update.run
+      .transact(xa)
+      .unsafeToFuture()
+  }
+
   def findByID(id: UUID): Future[Option[Product]] = {
     sql"SELECT * FROM Product WHERE id=$id"
       .query[Product]

@@ -36,7 +36,7 @@ class APIControllerSpec
   "postProduct method" should {
     "return successful when adding a product with all needed values" in {
       val controller = inject[APIController]
-      val product = ProductFromJson(Some("crepe"), Some(5), Some(4.99))
+      val product = ProductFromJson(Some("crepe"), Some(5), Some(4.99), None)
       val fakeRequest = FakeRequest(
         POST,
         controllers.routes.APIController.postProduct().url
@@ -53,7 +53,7 @@ class APIControllerSpec
     }
     "return unsuccessful when trying to add a product with no values" in {
       val controller = inject[APIController]
-      val product = ProductFromJson(None, None, None)
+      val product = ProductFromJson(None, None, None, None)
       val fakeRequest = FakeRequest(
         POST,
         controllers.routes.APIController.postProduct().url
@@ -70,7 +70,7 @@ class APIControllerSpec
     }
     "return unsuccessful when trying to add a product with some values" in {
       val controller = inject[APIController]
-      val product = ProductFromJson(Some("crepe"), None, Some(4.99))
+      val product = ProductFromJson(Some("crepe"), None, Some(4.99), None)
       val fakeRequest = FakeRequest(
         POST,
         controllers.routes.APIController.postProduct().url
@@ -90,11 +90,24 @@ class APIControllerSpec
 
     "return successful when passing in the ID and some values" in {
       val controller = inject[APIController]
-
-      val uuid: UUID = UUID.fromString("e5ebc341-ab74-4d31-ae15-342a302ff44b")
-      val product = ProductFromJson(None, Some(5), Some(4.99))
-      val fakeRequest = FakeRequest(
+      val uuid: UUID = UUID.randomUUID()
+      val product =
+        ProductFromJson(Some("crepe"), Some(5), Some(4.99), Some(uuid))
+      val fakePostRequest = FakeRequest(
         POST,
+        controllers.routes.APIController.postProduct().url
+      ).withBody(product)
+        .withHeaders(("Content-Type" -> "application/json"))
+
+      controller
+        .postProduct()
+        .apply(
+          fakePostRequest
+        )
+
+      val editProduct = ProductFromJson(None, Some(10), Some(9.99), None)
+      val fakeEditRequest = FakeRequest(
+        PUT,
         controllers.routes.APIController.editByID(uuid).url
       ).withBody(product)
         .withHeaders(("Content-Type" -> "application/json"))
@@ -102,7 +115,7 @@ class APIControllerSpec
       val result: Future[Result] = controller
         .editByID(uuid)
         .apply(
-          fakeRequest
+          fakeEditRequest
         )
 
       status(result) mustBe 200
