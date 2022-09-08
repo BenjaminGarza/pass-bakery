@@ -36,21 +36,20 @@ class APIControllerSpec
   "postProduct method" should {
     "return successful when adding a product with all needed values" in {
       val controller = inject[APIController]
-      val product = ProductFromJson(Some("crepe"), Some(5), Some(4.99)).asJson
+      val product = ProductFromJson(Some("crepe"), Some(5), Some(4.99))
       val fakeRequest = FakeRequest(
         POST,
         controllers.routes.APIController.postProduct().url
       ).withBody(product)
         .withHeaders(("Content-Type" -> "application/json"))
 
-      val result: Accumulator[ByteString, Result] = controller
+      val result: Future[Result] = controller
         .postProduct()
         .apply(
           fakeRequest
         )
-      val runResult: Future[Result] = result.run()(mtrlzr)
 
-      status(runResult) mustBe 200
+      status(result) mustBe 200
     }
     "return unsuccessful when trying to add a product with no values" in {
       val controller = inject[APIController]
@@ -76,27 +75,26 @@ class APIControllerSpec
     "return successful when passing in the ID and some values" in {
       val controller = inject[APIController]
 
-      val uuid: UUID = UUID.fromString("a62bf2f7-732d-47a0-b791-3140784784b0")
-      val product = ProductFromJson(None, Some(5), Some(4.99)).asJson
+      val uuid: UUID = UUID.fromString("e5ebc341-ab74-4d31-ae15-342a302ff44b")
+      val product = ProductFromJson(None, Some(5), Some(4.99))
       val fakeRequest = FakeRequest(
         POST,
         controllers.routes.APIController.editByID(uuid).url
       ).withBody(product)
         .withHeaders(("Content-Type" -> "application/json"))
 
-      val result: Accumulator[ByteString, Result] = controller
+      val result: Future[Result] = controller
         .editByID(uuid)
         .apply(
           fakeRequest
         )
-      val runResult: Future[Result] = result.run()(mtrlzr)
 
-      status(runResult) mustBe 200
+      status(result) mustBe 200
     }
     "return unsuccessful when passing in an invalid ID" in {
 
       val controller = inject[APIController]
-      val uuid: UUID = UUID.fromString("a62bf2f7-732d-47a0-b791-3140784704b0")
+      val uuid: UUID = UUID.randomUUID()
 
       val result = controller
         .editByID(uuid)
@@ -149,14 +147,14 @@ class APIControllerSpec
 //              "{\"name\": \"l@at&te9008865\", \"quantity\": \"9\", \"price\": \"8.99\"}"
 //          )
 //        )
-//      val findByName = bakeryDB.findByName(name)
-//      val result = findByName match {
-//        case None => "Nothing here"
-//        case Some(product) =>
-//          controller.deleteByID(product.id).toString()
-//      }
-//      result mustBe 200
 //
+//      val findByName: Action[AnyContent] = controller.findByName(name)
+//
+//      val result =
+//
+//          controller.deleteByID().toString()
+//      }
+//    status(result)
 //    }
 //  }
   database.shutdown()

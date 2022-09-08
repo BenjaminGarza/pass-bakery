@@ -41,19 +41,18 @@ class APIController @Inject() (
       Future { Ok(statusToJson) }
   }
 
-  def postProduct() = Action.async(circe.tolerantJson[ProductFromJson]) {
-    request =>
+  def postProduct(): Action[ProductFromJson] =
+    Action.async(circe.tolerantJson[ProductFromJson]) { request =>
       Future {
         val product = request.body
         (product.name, product.quantity, product.price) match {
           case (Some(name), Some(quantity), Some(price)) =>
-            val rowsUpdated = {
-              bakeryDB.addProduct(
-                name,
-                quantity,
-                price
-              )
-            }
+            bakeryDB.addProduct(
+              name,
+              quantity,
+              price
+            )
+
             Ok(
               "Post successful"
             )
@@ -61,7 +60,7 @@ class APIController @Inject() (
 
         }
       }
-  }
+    }
 
   def findByID(id: UUID): Action[AnyContent] = Action.async {
     implicit request: Request[AnyContent] =>
@@ -70,6 +69,15 @@ class APIController @Inject() (
           NotFound("Product not found")
         case Some(product) =>
           Ok(product.asJson.spaces2)
+      }
+
+  }
+  def findByName(name: String): Action[AnyContent] = Action.async {
+    implicit request: Request[AnyContent] =>
+      bakeryDB.findByName(name).map { product =>
+        Ok(
+          product.asJson.spaces2
+        )
       }
 
   }
