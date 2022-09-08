@@ -127,8 +127,8 @@ class APIController @Inject() (
         case None =>
           NotFound("Product not found")
         case Some(product) =>
-          val rowsModified = bakeryDB.deleteByID(id)
-          Ok(rowsModified.toString ++ " row deleted")
+          bakeryDB.deleteByID(id)
+          Ok("Product deleted")
       }
   }
 }

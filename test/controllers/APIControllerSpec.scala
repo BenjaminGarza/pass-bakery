@@ -109,7 +109,7 @@ class APIControllerSpec
       val fakeEditRequest = FakeRequest(
         PUT,
         controllers.routes.APIController.editByID(uuid).url
-      ).withBody(product)
+      ).withBody(editProduct)
         .withHeaders(("Content-Type" -> "application/json"))
 
       val result: Future[Result] = controller
@@ -160,31 +160,41 @@ class APIControllerSpec
       status(result) mustBe 200
     }
   }
-//  "Delete product" should {
-//
-//    "Return success when deleting a product from the database" in {
-//      val controller = inject[APIController]
-//      val name = "l@at&te9008865"
-//      val setUp: Future[Result] = controller
-//        .postProduct()
-//        .apply(
-//          FakeRequest(
-//            POST,
-//            "/pass-bakery/product"
-//          ).withTextBody(
-//            text =
-//              "{\"name\": \"l@at&te9008865\", \"quantity\": \"9\", \"price\": \"8.99\"}"
-//          )
-//        )
-//
-//      val findByName: Action[AnyContent] = controller.findByName(name)
-//
-//      val result =
-//
-//          controller.deleteByID().toString()
-//      }
-//    status(result)
-//    }
-//  }
+  "Delete product" should {
+
+    "return successful when deleting a product from the database" in {
+      val controller = inject[APIController]
+      val uuid: UUID = UUID.randomUUID()
+      val product =
+        ProductFromJson(Some("crepe"), Some(5), Some(4.99), Some(uuid))
+      val fakePostRequest = FakeRequest(
+        POST,
+        controllers.routes.APIController.postProduct().url
+      ).withBody(product)
+        .withHeaders(("Content-Type" -> "application/json"))
+
+      controller
+        .postProduct()
+        .apply(
+          fakePostRequest
+        )
+
+      val fakeDeleteRequest = FakeRequest(
+        DELETE,
+        controllers.routes.APIController.deleteByID(uuid).url
+      ).withBody()
+        .withHeaders(("Content-Type" -> "application/json"))
+
+      val result = controller
+        .deleteByID(uuid)
+        .apply(
+          fakeDeleteRequest
+        )
+
+      status(result) mustBe (200)
+
+    }
+  }
+
   database.shutdown()
 }
