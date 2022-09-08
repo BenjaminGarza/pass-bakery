@@ -1,23 +1,17 @@
 package controllers
 
-import akka.stream.Materializer
-import akka.util.ByteString
-import io.circe.{Json, JsonObject}
-import io.circe.syntax.EncoderOps
+import java.util.UUID
 import models.ProductFromJson
 import org.scalatestplus.play._
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import play.api.db.Databases
+import play.api.mvc._
 import play.api.Play.materializer
 import play.api.test.Helpers._
 import play.api.test.{FakeHeaders, FakeRequest, Injecting}
-import play.api.mvc._
-
-import java.util.UUID
+import play.api.inject.guice.GuiceApplicationBuilder
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
-import play.api.db.Databases
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.streams.Accumulator
 
 class APIControllerSpec
     extends PlaySpec
@@ -26,7 +20,6 @@ class APIControllerSpec
     with Injecting {
 
   def mockApp = new GuiceApplicationBuilder().build()
-  val mtrlzr = mockApp.injector.instanceOf[Materializer]
 
   val database = Databases(
     driver = "org.h2.Driver",
@@ -134,8 +127,7 @@ class APIControllerSpec
           ).withBody("""{"name": "crepe", "quantity": 5, "price": 4.99}""")
             .withHeaders(("Content-Type:", "application/json"))
         )
-      val runResult: Future[Result] = result.run()(mtrlzr)
-      status(runResult) mustBe 400
+      status(result) mustBe 400
     }
   }
   "findAllProducts" should {
@@ -192,7 +184,6 @@ class APIControllerSpec
         )
 
       status(result) mustBe (200)
-
     }
   }
 
