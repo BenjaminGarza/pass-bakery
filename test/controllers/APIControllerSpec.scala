@@ -161,17 +161,18 @@ class APIControllerSpec
       ).withBody(product)
         .withHeaders(("Content-Type" -> "application/json"))
 
-      controller
+      val resultPost = controller
         .postProduct()
         .apply(
           fakePostRequest
         )
 
+      info(status(resultPost).toString)
+
       val fakeDeleteRequest = FakeRequest(
         DELETE,
         controllers.routes.APIController.deleteByID(uuid).url
-      ).withBody()
-        .withHeaders(("Content-Type" -> "application/json"))
+      )
 
       val result = controller
         .deleteByID(uuid)
