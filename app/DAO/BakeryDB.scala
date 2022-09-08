@@ -59,14 +59,6 @@ class BakeryDB @Inject() (
       .unsafeToFuture()
   }
 
-  def findByName(name: String): Future[Option[Product]] = {
-    sql"SELECT * FROM Product WHERE name=$name"
-      .query[Product]
-      .option
-      .transact(xa)
-      .unsafeToFuture()
-  }
-
   def findAll(): Future[List[Product]] = {
     sql"SELECT * FROM Product"
       .query[Product]

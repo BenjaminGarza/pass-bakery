@@ -13,7 +13,6 @@ GET     /assets/*file                   controllers.Assets.versioned(path="/publ
 POST    /rest/bakery/product                controllers.APIController.postProduct()
 GET     /pass-bakery/status                 controllers.APIController.serviceStatus()
 GET     /rest/bakery/product                controllers.APIController.findAllProducts()
-GET     /rest/bakery/product/:name          controllers.APIController.findByName(name: String)
 GET     /rest/bakery/product/:id            controllers.APIController.findByID(id: java.util.UUID)
 PUT     /rest/bakery/product/:id            controllers.APIController.editByID(id: java.util.UUID)
 DELETE  /rest/bakery/product/:id            controllers.APIController.deleteByID(id: java.util.UUID)

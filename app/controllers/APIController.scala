@@ -83,15 +83,6 @@ class APIController @Inject() (
       }
 
   }
-  def findByName(name: String): Action[AnyContent] = Action.async {
-    implicit request: Request[AnyContent] =>
-      bakeryDB.findByName(name).map { product =>
-        Ok(
-          product.asJson.spaces2
-        )
-      }
-
-  }
 
   def findAllProducts(): Action[AnyContent] = Action.async {
     implicit request: Request[AnyContent] =>

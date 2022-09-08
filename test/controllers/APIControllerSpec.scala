@@ -80,7 +80,6 @@ class APIControllerSpec
     }
   }
   "Edit product method" should {
-
     "return successful when passing in the ID and some values" in {
       val controller = inject[APIController]
       val uuid: UUID = UUID.randomUUID()
@@ -131,7 +130,6 @@ class APIControllerSpec
     }
   }
   "findAllProducts" should {
-
     "return HTTP Status 200 when retrieving all products" in {
       val controller = inject[APIController]
       val result: Future[Result] = controller
@@ -142,7 +140,6 @@ class APIControllerSpec
     }
   }
   "Status endpoint" should {
-
     "return current service status on GET" in {
       val controller = inject[APIController]
       val result: Future[Result] = controller
@@ -153,7 +150,6 @@ class APIControllerSpec
     }
   }
   "Delete product" should {
-
     "return successful when deleting a product from the database" in {
       val controller = inject[APIController]
       val uuid: UUID = UUID.randomUUID()
