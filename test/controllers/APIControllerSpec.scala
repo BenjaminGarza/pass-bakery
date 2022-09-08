@@ -53,21 +53,37 @@ class APIControllerSpec
     }
     "return unsuccessful when trying to add a product with no values" in {
       val controller = inject[APIController]
-      val product = ProductFromJson(None, None, None).asJson
+      val product = ProductFromJson(None, None, None)
       val fakeRequest = FakeRequest(
         POST,
         controllers.routes.APIController.postProduct().url
       ).withBody(product)
         .withHeaders(("Content-Type" -> "application/json"))
 
-      val result: Accumulator[ByteString, Result] = controller
+      val result: Future[Result] = controller
         .postProduct()
         .apply(
           fakeRequest
         )
-      val runResult: Future[Result] = result.run()(mtrlzr)
 
-      status(runResult) mustBe 400
+      status(result) mustBe 400
+    }
+    "return unsuccessful when trying to add a product with some values" in {
+      val controller = inject[APIController]
+      val product = ProductFromJson(Some("crepe"), None, Some(4.99))
+      val fakeRequest = FakeRequest(
+        POST,
+        controllers.routes.APIController.postProduct().url
+      ).withBody(product)
+        .withHeaders(("Content-Type" -> "application/json"))
+
+      val result: Future[Result] = controller
+        .postProduct()
+        .apply(
+          fakeRequest
+        )
+
+      status(result) mustBe 400
     }
   }
   "Edit product method" should {
