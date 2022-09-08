@@ -2,10 +2,10 @@ package models
 
 import cats.effect.IO
 import doobie.Transactor
-import play.api.{Configuration, Environment}
+import play.api.{Configuration}
 import javax.inject.Inject
 
-class DBTransactor @Inject() (environment: Environment, config: Configuration) {
+class DBTransactor @Inject() (config: Configuration) {
   val xa: Transactor[IO] =
     Transactor.fromDriverManager[IO](
       config.get[String]("db.default.driver"),
